@@ -1,17 +1,20 @@
 const User = require('../models/users');
+const jwt = require('jsonwebtoken')
+const secret =  'GuestbookSecret';
 
 module.exports = {
     register: async (req, res, next) => {
-        let user
+        let user, token
         const record = {
             name : req.body.name,
             email: req.body.email,
             password: req.body.password
         };
         try {
-            user =  await User.create(record); 
+            user =  await User.create(record);
+            token = await sign({email: user.email, name: user.name, _id: user._id})
             res.send({
-                data: user
+                data: user, token
             });
         }
         catch (error) {
@@ -24,8 +27,9 @@ module.exports = {
             if (user) {
                 const isValidPassword = await user.validatePassword(req.body.password)
                 if (isValidPassword) {
+                    let token = await sign({email: user.email, name: user.name, _id: user._id})
                     res.send({
-                        data: user
+                        data: user, token
                     });
                 }
                 res.status(401).send('email or password is incorrect')
@@ -35,4 +39,12 @@ module.exports = {
             return next(error);
         }
     },
+};
+async function sign(payload) {
+    return await jwt.sign(payload, secret, {
+        issuer:  'Guestbook App',
+        subject:  'user',
+        audience:  'guestbook',
+        expiresIn: '7d'
+    })
 }

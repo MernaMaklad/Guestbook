@@ -8,11 +8,12 @@ module.exports = {
         const record = {
             name : req.body.name,
             email: req.body.email,
-            password: req.body.password
+            password: req.body.password,
+            isOwner: req.body.isOwner
         };
         try {
             user =  await User.create(record);
-            token = await sign({email: user.email, name: user.name, _id: user._id})
+            token = await sign({email: user.email, name: user.name, _id: user._id, isOwner: user.isOwner})
             res.send({
                 data: user, token
             });
@@ -27,7 +28,7 @@ module.exports = {
             if (user) {
                 const isValidPassword = await user.validatePassword(req.body.password)
                 if (isValidPassword) {
-                    let token = await sign({email: user.email, name: user.name, _id: user._id})
+                    let token = await sign({email: user.email, name: user.name, _id: user._id, isOwner: user.isOwner})
                     res.send({
                         data: user, token
                     });

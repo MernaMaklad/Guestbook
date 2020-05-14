@@ -14,7 +14,7 @@ module.exports = {
         try {
             user =  await User.create(record);
             token = await sign({email: user.email, name: user.name, _id: user._id, isOwner: user.isOwner})
-            res.send({
+            return res.send({
                 data: user, token
             });
         }
@@ -29,13 +29,13 @@ module.exports = {
                 const isValidPassword = await user.validatePassword(req.body.password)
                 if (isValidPassword) {
                     let token = await sign({email: user.email, name: user.name, _id: user._id, isOwner: user.isOwner})
-                    res.send({
+                    return res.send({
                         data: user, token
                     });
                 }
-                res.status(401).send('email or password is incorrect')
+                return res.status(401).send('email or password is incorrect')
             }
-            res.status(400).send('User not found')
+            return res.status(400).send('User not found')
         } catch (error) {
             return next(error);
         }

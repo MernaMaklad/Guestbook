@@ -5,7 +5,7 @@ module.exports = {
         let message
         try{
             message = await Message.create({message: req.body.message, userId: req.user._id, receiverId: req.body.receiverId})
-            res.send({
+            return res.send({
                 data: message
             });
         }catch(error){
@@ -15,7 +15,7 @@ module.exports = {
     editMessage : async(req, res, next) => {
         try{
             const message = await Message.findOneAndUpdate({_id: req.params.id, userId: req.user._id}, {message: req.body.message}, {new: true})
-            res.send({
+            return res.send({
                 data: message,
                 message:"Message Update Successfully"
             });
@@ -25,8 +25,8 @@ module.exports = {
     },
     getMessages: async(req, res, next) => {
         try{
-            const messages = await Message.find()
-            res.send({
+            const messages = await Message.find().populate('userId')
+            return res.send({
                 data: messages
             })
         }catch(error){
@@ -35,8 +35,8 @@ module.exports = {
     },
     getMessageById: async (req, res, next) => {
         try{
-            const message = await Message.findOne({_id: req.params.id})
-            res.send({
+            const message = await Message.findOne({_id: req.params.id}).populate('userId')
+            return res.send({
                 data: message
             })
         }catch(error){
@@ -46,7 +46,7 @@ module.exports = {
     replyMessage: async(req, res, next) =>{
         try{
             const message = await Message.findOneAndUpdate({_id: req.params.id, receiverId: req.user._id}, {reply: req.body.reply}, {useFindAndModify: false, new: true})
-            res.send({
+            return res.send({
                 data: message,
                 message:"Reply Added Successfully"
             });
@@ -57,7 +57,7 @@ module.exports = {
     deleteMessage: async(req, res, next) => {
         try{
             const message = await Message.findOneAndDelete({_id: req.params.id, userId: req.user._id})
-            res.send({
+            return res.send({
                 data: message,
                 message: "Deleted Successfully"
             })
